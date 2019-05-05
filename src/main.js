@@ -30,6 +30,10 @@ const routes=[
   {
     path:'/index',
     component:index
+  },  
+  {
+    path:'/',
+    redirect:'index'
   },
   {
     path:'/detail/:id',
@@ -44,15 +48,19 @@ const routes=[
     component:user,
     children:[
       {
-        path:'/user/listindex',
+        path:'listindex',
         component:indexlist
       },
       {
-        path:'/user/order',
+        path:'',
+        redirect:'listindex'
+      },
+      {
+        path:'order',
         component:order
       },
       {
-        path:'/user/detatle',
+        path:'detatle',
         component:detatle
       }
     ]

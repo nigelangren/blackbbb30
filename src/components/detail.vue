@@ -178,9 +178,16 @@
                   </ul>
                   <div class="page-box" style="margin: 5px 0px 0px 62px;">
                     <div id="pagination" class="digg">
-                      <span class="disabled">« 上一页</span>
-                      <span class="current">1</span>
-                      <span class="disabled">下一页 »</span>
+                      <el-pagination
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                        :current-page="pageIndex"
+                        :page-sizes="[5, 10, 15, 18]"
+                        :page-size="pageSize"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        :total="pinlunlist.totalcount"
+                        background
+                      ></el-pagination>
                     </div>
                   </div>
                 </div>
@@ -194,12 +201,18 @@
                 <ul class="side-img-list">
                   <li v-for="(item, index) in hotgoodslist" :key="index">
                     <div class="img-box">
-                      <a href="#/site/goodsinfo/90" class>
+                      <!-- <a href="#/site/goodsinfo/90" class> -->
+                      <router-link :to="'/detail/'+item.id">
                         <img :src="item.img_url">
-                      </a>
+                      </router-link>
+                      <!-- </a> -->
                     </div>
                     <div class="txt-box">
-                      <a href="#/site/goodsinfo/90" class>{{item.title}}</a>
+                      <!-- <a href="#/site/goodsinfo/90" class> -->
+                      <router-link :to="'/detail/'+item.id">
+                      {{item.title}}
+                      <!-- </a> -->
+                      </router-link>
                       <span>{{item.add_time | momentlist}}</span>
                     </div>
                   </li>
@@ -227,13 +240,15 @@ export default {
       index: 1,
       commentList: [],
       msg: "",
-      listnum: 1
+      listnum: 1,
+      pinlunlist: [],
+      pageSize: 10,
+      pageIndex: 1
     };
   },
   created() {
-    console.log(this.$route.params.id);
-    axios
-      .get(
+    // console.log(this.$route.params.id);
+    axios.get(
         `http://111.230.232.110:8899/site/goods/getgoodsinfo/${
           this.$route.params.id
         }`
@@ -243,25 +258,19 @@ export default {
         this.goodsinfo = response.data.message.goodsinfo;
         this.hotgoodslist = response.data.message.hotgoodslist;
         this.imglist = response.data.message.imglist;
-      }),
+      });
+
       axios
         .get(
           `http://111.230.232.110:8899/site/comment/getbypage/goods/${
             this.$route.params.id
-          }?pageIndex=1&pageSize=10`
+          }?pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`
         )
         .then(response => {
+          this.pinlunlist = response.data;
           console.log(response);
           this.getbypage = response.data.message;
         });
-    //             axios
-    //   .get(
-    //     `http://111.230.232.110:8899/site/site/validate/comment/post/goods/${this.$route.params.id}`
-    //   )
-    //   .then(response => {
-    //     console.log(response);
-    //     // this.getbypage=response.data.message
-    //   })
   },
   filters: {
     momentlist(value) {
@@ -269,6 +278,26 @@ export default {
     }
   },
   methods: {
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`);  
+
+
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`);
+      this.pageIndex = val;
+            axios
+        .get(
+          `http://111.230.232.110:8899/site/comment/getbypage/goods/${
+            this.$route.params.id
+          }?pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`
+        )
+        .then(response => {
+          this.pinlunlist = response.data;
+          console.log(response);
+          this.getbypage = response.data.message;
+        });
+    },
     detaillist() {
       this.index = 1;
     },
@@ -290,14 +319,16 @@ export default {
         )
         .then(response => {
           console.log(response);
+
           if (response.data.message == "评论成功") {
             axios
               .get(
                 `http://111.230.232.110:8899/site/comment/getbypage/goods/${
                   this.$route.params.id
-                }?pageIndex=1&pageSize=10`
+                }?pageIndex=${this.pageIndex}&pageSize=${this.pageSize}`
               )
               .then(response => {
+                this.pinlunlist = response;
                 console.log(response);
                 this.getbypage = response.data.message;
               });
@@ -316,6 +347,21 @@ export default {
         return;
       }
       this.listnum++;
+    }
+  },
+  watch:{
+    '$route.params.id'(vw,vo){
+          axios.get(
+        `http://111.230.232.110:8899/site/goods/getgoodsinfo/${
+          vw
+        }`
+      )
+      .then(response => {
+        // console.log(response);
+        this.goodsinfo = response.data.message.goodsinfo;
+        this.hotgoodslist = response.data.message.hotgoodslist;
+        this.imglist = response.data.message.imglist;
+      });
     }
   }
 };
