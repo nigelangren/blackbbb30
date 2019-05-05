@@ -17,17 +17,20 @@
               <strong>|</strong>
             </span>
             <span>
-              <a href class>会员中心</a>
+              <router-link to="/user">会员中心</router-link>
+              <!-- <a href class></a> -->
               <strong>|</strong>
               <a>退出</a>
               <strong>|</strong>
             </span>
-            <a href class>
+            <router-link to="/cart">
+            <!-- <a href class> -->
               <i class="iconfont icon-cart"></i>购物车(
               <span id="shoppingCartCount">
                 <span>4</span>
               </span>)
-            </a>
+            <!-- </a> -->
+            </router-link>
           </div>
         </div>
       </div>
@@ -125,8 +128,9 @@
 </template>
 
 <script>
+
 export default {
-  
+
 
 };
 
